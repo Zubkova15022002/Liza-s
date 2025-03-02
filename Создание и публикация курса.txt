@@ -1,0 +1,86 @@
+@startuml
+title Sequence Diagram: Create and Publish Course
+
+actor Teacher
+participant "Web Application" as WebApp
+participant "API Gateway" as ApiGateway
+participant "Course Service" as CourseService
+participant "Content Delivery (CMS)" as CMS
+participant "Database" as DB
+
+' Teacher initiates course creation
+Teacher -> WebApp: Запрашивает страницу создания курса
+WebApp -> ApiGateway: Отправляет запрос на создание курса (title, description, teacher_id)
+activate ApiGateway
+
+ApiGateway -> CourseService: Передает запрос на создание курса
+activate CourseService
+
+CourseService -> CourseService: Валидирует данные (title, description)
+CourseService -> DB: Создает новый курс (title, description, teacher_id, created_at, updated_at)
+activate DB
+DB --> CourseService: Возвращает course_id
+deactivate DB
+
+CourseService --> ApiGateway: Возвращает course_id
+deactivate CourseService
+
+ApiGateway --> WebApp: Возвращает course_id
+deactivate ApiGateway
+
+WebApp --> Teacher: Отображает страницу редактирования курса (course_id)
+
+' Teacher uploads content
+Teacher -> WebApp: Загружает учебные материалы (file, material_type)
+WebApp -> ApiGateway: Отправляет запрос на загрузку материала (course_id, file, material_type)
+activate ApiGateway
+
+ApiGateway -> CourseService: Передает запрос на загрузку материала
+activate CourseService
+
+CourseService -> CMS: Сохраняет файл учебного материала
+activate CMS
+CMS --> CourseService: Возвращает file_path
+deactivate CMS
+
+CourseService -> DB: Создает запись о материале (course_id, file_path, material_type, uploaded_at)
+activate DB
+DB --> CourseService: Подтверждает создание записи
+deactivate DB
+
+CourseService --> ApiGateway: Подтверждает загрузку материала
+deactivate CourseService
+
+ApiGateway --> WebApp: Подтверждает загрузку материала
+deactivate ApiGateway
+
+WebApp --> Teacher: Отображает список учебных материалов
+
+' Teacher publishes the course
+Teacher -> WebApp: Запрашивает публикацию курса
+WebApp -> ApiGateway: Отправляет запрос на публикацию курса (course_id)
+activate ApiGateway
+
+ApiGateway -> CourseService: Передает запрос на публикацию курса
+activate CourseService
+
+CourseService -> CourseService: Проверяет, добавлены ли учебные материалы
+alt Нет учебных материалов
+  CourseService --> ApiGateway: Возвращает ошибку "Добавьте учебные материалы перед публикацией"
+  ApiGateway --> WebApp: Возвращает ошибку
+  WebApp --> Teacher: Отображает сообщение об ошибке
+else Учебные материалы добавлены
+  CourseService -> DB: Обновляет статус курса на "Опубликовано"
+  activate DB
+  DB --> CourseService: Подтверждает обновление статуса
+  deactivate DB
+
+  CourseService --> ApiGateway: Подтверждает публикацию курса
+  deactivate CourseService
+
+  ApiGateway --> WebApp: Подтверждает публикацию курса
+  deactivate ApiGateway
+
+  WebApp --> Teacher: Отображает сообщение об успешной публикации
+end
+@enduml
