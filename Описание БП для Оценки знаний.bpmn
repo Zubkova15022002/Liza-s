@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             id="Definitions_1"
+             targetNamespace="http://www.bpmn.org/schema/bpmn"
+             exporter="Camunda Modeler" exporterVersion="4.8.0">
+
+    <process id="Process_Evaluation" isExecutable="true">
+        <startEvent id="StartEvent" name="Начало процесса"/>
+        <task id="PrepareTest" name="Преподаватель готовит тест"/>
+        <task id="PublishTest" name="Преподаватель публикует тест для студентов"/>
+        <task id="StudentsTakeTest" name="Студенты проходят тест"/>
+        <task id="CheckTests" name="Преподаватель проверяет тесты"/>
+        <task id="GradeResults" name="Преподаватель выставляет оценки"/>
+        <task id="NotifyStudents" name="Система уведомляет студентов об оценках"/>
+        <task id="ProvideFeedback" name="Преподаватель предоставляет обратную связь по тесту"/>
+        <endEvent id="EndEvent" name="Конец процесса"/>
+
+        <sequenceFlow id="flow1" sourceRef="StartEvent" targetRef="PrepareTest"/>
+        <sequenceFlow id="flow2" sourceRef="PrepareTest" targetRef="PublishTest"/>
+        <sequenceFlow id="flow3" sourceRef="PublishTest" targetRef="StudentsTakeTest"/>
+        <sequenceFlow id="flow4" sourceRef="StudentsTakeTest" targetRef="CheckTests"/>
+        <sequenceFlow id="flow5" sourceRef="CheckTests" targetRef="GradeResults"/>
+        <sequenceFlow id="flow6" sourceRef="GradeResults" targetRef="NotifyStudents"/>
+        <sequenceFlow id="flow7" sourceRef="NotifyStudents" targetRef="ProvideFeedback"/>
+        <sequenceFlow id="flow8" sourceRef="ProvideFeedback" targetRef="EndEvent"/>
+    </process>
+
+    <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+        <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_Evaluation">
+            <bpmndi:BPMNShape id="StartEvent_di" bpmnElement="StartEvent">
+                <dc:Bounds x="100" y="100" width="36" height="36"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="PrepareTest_di" bpmnElement="PrepareTest">
+                <dc:Bounds x="200" y="100" width="100" height="80"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="PublishTest_di" bpmnElement="PublishTest">
+                <dc:Bounds x="350" y="100" width="100" height="80"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="StudentsTakeTest_di" bpmnElement="StudentsTakeTest">
+                <dc:Bounds x="500" y="100" width="100" height="80"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="CheckTests_di" bpmnElement="CheckTests">
+                <dc:Bounds x="650" y="100" width="100" height="80"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="GradeResults_di" bpmnElement="GradeResults">
+                <dc:Bounds x="800" y="100" width="100" height="80"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="NotifyStudents_di" bpmnElement="NotifyStudents">
+                <dc:Bounds x="950" y="100" width="100" height="80"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:B
