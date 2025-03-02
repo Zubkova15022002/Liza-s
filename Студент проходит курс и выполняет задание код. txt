@@ -1,0 +1,103 @@
+@startuml
+title Sequence Diagram: Student Enrolls in Course and Completes Assignment
+
+actor Student
+
+participant "Web Application" as WebApp
+participant "API Gateway" as ApiGateway
+participant "Course Service" as CourseService
+participant "User Service" as UserService
+participant "Content Delivery (CMS)" as CMS
+participant "Assignment Service" as AssignmentService
+participant "Database" as DB
+
+' Student enrolls in the course
+Student -> WebApp: Просматривает каталог курсов
+WebApp -> ApiGateway: Запрашивает список доступных курсов
+activate ApiGateway
+ApiGateway -> CourseService: Передает запрос на список курсов
+activate CourseService
+CourseService -> DB: Запрашивает список курсов
+activate DB
+DB --> CourseService: Возвращает список курсов
+deactivate DB
+CourseService --> ApiGateway: Возвращает список курсов
+deactivate CourseService
+ApiGateway --> WebApp: Возвращает список курсов
+deactivate ApiGateway
+WebApp --> Student: Отображает список курсов
+
+Student -> WebApp: Выбирает курс и запрашивает зачисление
+WebApp -> ApiGateway: Отправляет запрос на зачисление (course_id, student_id)
+activate ApiGateway
+ApiGateway -> CourseService: Передает запрос на зачисление
+activate CourseService
+CourseService -> CourseService: Проверяет, есть ли места на курсе
+CourseService -> DB: Создает запись о зачислении (course_id, student_id, enrollment_date)
+activate DB
+DB --> CourseService: Подтверждает зачисление
+deactivate DB
+CourseService --> ApiGateway: Подтверждает зачисление
+deactivate CourseService
+ApiGateway --> WebApp: Подтверждает зачисление
+deactivate ApiGateway
+WebApp --> Student: Отображает подтверждение о зачислении
+
+' Student views course content
+Student -> WebApp: Переходит к учебным материалам курса
+WebApp -> ApiGateway: Запрашивает учебные материалы (course_id)
+activate ApiGateway
+ApiGateway -> CourseService: Передает запрос на учебные материалы
+activate CourseService
+CourseService -> DB: Запрашивает список учебных материалов (course_id)
+activate DB
+DB --> CourseService: Возвращает список учебных материалов
+deactivate DB
+loop Для каждого учебного материала
+    CourseService -> CMS: Запрашивает URL для учебного материала (file_path)
+    activate CMS
+    CMS --> CourseService: Возвращает URL
+    deactivate CMS
+end
+CourseService --> ApiGateway: Возвращает список учебных материалов с URL
+deactivate CourseService
+ApiGateway --> WebApp: Возвращает список учебных материалов с URL
+deactivate ApiGateway
+WebApp --> Student: Отображает учебные материалы
+
+' Student completes an assignment
+Student -> WebApp: Открывает страницу задания (assignment_id)
+WebApp -> ApiGateway: Запрашивает информацию о задании (assignment_id)
+activate ApiGateway
+ApiGateway -> AssignmentService: Передает запрос на информацию о задании
+activate AssignmentService
+AssignmentService -> DB: Запрашивает информацию о задании (assignment_id)
+activate DB
+DB --> AssignmentService: Возвращает информацию о задании
+deactivate DB
+AssignmentService --> ApiGateway: Возвращает информацию о задании
+deactivate AssignmentService
+ApiGateway --> WebApp: Возвращает информацию о задании
+deactivate ApiGateway
+WebApp --> Student: Отображает информацию о задании
+
+Student -> WebApp: Загружает решение задания (file)
+WebApp -> ApiGateway: Отправляет решение задания (assignment_id, student_id, file)
+activate ApiGateway
+ApiGateway -> AssignmentService: Передает решение задания
+activate AssignmentService
+AssignmentService -> CMS: Сохраняет решение задания (file)
+activate CMS
+CMS --> AssignmentService: Возвращает file_path
+deactivate CMS
+AssignmentService -> DB: Создает запись о решении задания (assignment_id, student_id, file_path, submission_date)
+activate DB
+DB --> AssignmentService: Подтверждает создание записи
+deactivate DB
+AssignmentService --> ApiGateway: Подтверждает отправку решения
+deactivate AssignmentService
+ApiGateway --> WebApp: Подтверждает отправку решения
+deactivate ApiGateway
+WebApp --> Student: Отображает подтверждение об отправке решения
+
+@enduml
