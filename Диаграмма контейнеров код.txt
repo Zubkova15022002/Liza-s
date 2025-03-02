@@ -1,0 +1,51 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+LAYOUT_WITH_LEGEND()
+
+title Container Diagram for Online Learning Platform
+
+' Persons (External)
+Person(teacher, "Преподаватель", "Создает, управляет курсами, оценивает студентов.")
+Person(student, "Студент", "Проходит курсы, выполняет задания, получает обратную связь.")
+Person(admin, "Администратор платформы", "Поддерживает и управляет платформой, обеспечивает безопасность.")
+
+' System Boundary
+System_Boundary(c1, "Платформа для онлайн-обучения") {
+
+  ' Containers
+  Container(web_app, "Веб-приложение", "Java, Spring Boot", "Предоставляет веб-интерфейс для преподавателей, студентов и администраторов.")
+  Container(mobile_app, "Мобильное приложение", "React Native", "Предоставляет мобильный интерфейс для студентов.")
+  Container(api_gateway, "API Gateway", "Node.js, Express", "Обрабатывает все API-запросы и обеспечивает безопасность.")
+  Container(course_service, "Сервис курсов", "Java, Spring Boot", "Управляет информацией о курсах, учебных материалах и расписании.")
+  Container(user_service, "Сервис пользователей", "Python, Flask", "Управляет учетными записями пользователей, аутентификацией и авторизацией.")
+  ContainerDb(database, "База данных", "PostgreSQL", "Хранит информацию о пользователях, курсах, учебных материалах и т.д.")
+  Container(notification_service, "Сервис уведомлений", "Node.js, Express", "Отправляет уведомления пользователям по электронной почте и push-уведомления.")
+  Container(analytics_service, "Сервис аналитики", "Python, Flask", "Собирает и анализирует данные о использовании платформы.")
+  Container(content_delivery, "Система управления контентом (CMS)", "Object Storage", "Хранит и предоставляет учебные материалы (видео, документы и т.д.).")
+}
+
+' Relationships
+
+Rel(teacher, web_app, "Использует для управления курсами и взаимодействия со студентами")
+Rel(student, web_app, "Использует для прохождения курсов и получения обратной связи")
+Rel(student, mobile_app, "Использует для прохождения курсов и получения обратной связи")
+Rel(admin, web_app, "Использует для администрирования платформы")
+
+Rel(web_app, api_gateway, "Делает API запросы", "HTTPS")
+Rel(mobile_app, api_gateway, "Делает API запросы", "HTTPS")
+
+Rel(api_gateway, course_service, "Передает запросы", "HTTPS")
+Rel(api_gateway, user_service, "Передает запросы", "HTTPS")
+
+Rel(course_service, database, "Читает и записывает данные")
+Rel(user_service, database, "Читает и записывает данные")
+
+Rel(api_gateway, notification_service, "Отправляет уведомления", "HTTPS")
+Rel(api_gateway, analytics_service, "Отправляет данные для анализа", "HTTPS")
+Rel(course_service, content_delivery, "Получает учебные материалы")
+
+Rel_Back(notification_service, teacher, "Отправляет уведомления", "Email/Push")
+Rel_Back(notification_service, student, "Отправляет уведомления", "Email/Push")
+
+@enduml
