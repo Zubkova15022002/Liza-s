@@ -1,0 +1,36 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+' uncomment the following line and comment the first to use locally
+' !include C4_Context.puml
+
+LAYOUT_WITH_LEGEND()
+
+title System Context Diagram for Online Learning Platform
+
+Person(teacher, "Преподаватель", "Создает, управляет курсами, оценивает студентов.")
+Person(institution, "Учебное заведение", "Управляет профилем организации, назначает преподавателей.")
+Person(student, "Студент", "Проходит курсы, выполняет задания, получает обратную связь.")
+Person(admin, "Администратор платформы", "Поддерживает и управляет платформой, обеспечивает безопасность.")
+
+System(online_learning_platform, "Платформа для онлайн-обучения", "Предоставляет возможность преподавателям, учебным заведениям и студентам взаимодействовать, обмениваться учебными материалами и знаниями.")
+
+System_Ext(content_delivery, "Система управления контентом (CMS)", "Хранение и предоставление учебных материалов (видео, документы и т.д.).")
+System_Ext(analytics_service, "Сервис аналитики", "Анализ данных о прогрессе студентов, посещаемости и эффективности курсов.")
+System_Ext(notification_service, "Сервис уведомлений", "Отправка уведомлений пользователям о новых материалах, заданиях и событиях.")
+System_Ext(payment_gateway, "Платежный шлюз", "Обработка платежей за курсы и подписки.")
+
+Rel(teacher, online_learning_platform, "Использует для управления курсами, публикацией материалов и оценки студентов")
+Rel(institution, online_learning_platform, "Использует для управления профилем организации и назначения преподавателей")
+Rel(student, online_learning_platform, "Использует для прохождения курсов, выполнения заданий и получения обратной связи")
+Rel(admin, online_learning_platform, "Использует для администрирования платформы, мониторинга и поддержки пользователей")
+
+Rel_Back(teacher, notification_service, "Получает уведомления о новых заданиях, отзывах и событиях", "Email/Push")
+Rel_Back(student, notification_service, "Получает уведомления о новых материалах, заданиях, оценках и событиях", "Email/Push")
+
+Rel_Neighbor(online_learning_platform, content_delivery, "Получает учебные материалы", "HTTP/REST")
+Rel_Neighbor(online_learning_platform, analytics_service, "Отправляет данные для анализа", "HTTP/REST")
+Rel_Neighbor(online_learning_platform, notification_service, "Отправляет уведомления пользователям", "HTTP/REST")
+Rel(student, payment_gateway, "Оплачивает курсы и подписки", "HTTP/REST")
+Rel(online_learning_platform, payment_gateway, "Перенаправляет для оплаты", "HTTP/REST")
+
+@enduml
