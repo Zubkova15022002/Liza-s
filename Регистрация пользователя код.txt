@@ -1,0 +1,49 @@
+@startuml
+title Sequence Diagram: User Registration
+
+actor User
+
+participant "Web Application" as WebApp
+participant "API Gateway" as ApiGateway
+participant "User Service" as UserService
+participant "Database" as DB
+participant "Notification Service" as NotificationService
+
+User -> WebApp: Запрашивает страницу регистрации
+WebApp -> ApiGateway: Отправляет запрос на регистрацию (username, password, email, role)
+activate ApiGateway
+
+ApiGateway -> UserService: Передает запрос на регистрацию
+activate UserService
+
+UserService -> UserService: Валидирует данные (email, password)
+UserService -> DB: Проверяет, существует ли пользователь с таким email
+activate DB
+DB --> UserService: Возвращает результат (true/false)
+deactivate DB
+
+alt Email уже занят
+  UserService --> ApiGateway: Возвращает ошибку "Email уже используется"
+  ApiGateway --> WebApp: Возвращает ошибку
+  WebApp --> User: Отображает сообщение об ошибке
+else Email свободен
+  UserService -> DB: Создает нового пользователя (username, password_hash, email, role, created_at)
+  activate DB
+  DB --> UserService: Возвращает ID нового пользователя
+  deactivate DB
+
+  UserService -> NotificationService: Отправляет запрос на отправку подтверждающего email (email, user_id)
+  activate NotificationService
+  NotificationService --> UserService: Подтверждение отправки
+  deactivate NotificationService
+
+  UserService --> ApiGateway: Возвращает успешный результат (user_id)
+  deactivate UserService
+
+  ApiGateway --> WebApp: Возвращает успешный результат
+  deactivate ApiGateway
+
+  WebApp --> User: Отображает сообщение об успешной регистрации
+  WebApp --> User: Перенаправляет на страницу входа
+end
+@enduml
