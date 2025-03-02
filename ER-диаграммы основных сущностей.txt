@@ -1,0 +1,80 @@
+@startuml
+!define ENTITY(name, attributes) entity name { attributes }
+
+ENTITY(Пользователи,
+  user_id : INT PK
+  --
+  name : VARCHAR
+  email : VARCHAR UK
+  password_hash : VARCHAR
+  role : VARCHAR
+  created_at : DATETIME
+)
+
+ENTITY(Курсы,
+  course_id : INT PK
+  --
+  title : VARCHAR
+  description : TEXT
+  teacher_id : INT FK
+  created_at : DATETIME
+  updated_at : DATETIME
+)
+
+ENTITY(Учебные_материалы,
+  material_id : INT PK
+  --
+  course_id : INT FK
+  file_path : VARCHAR
+  material_type : VARCHAR
+  uploaded_at : DATETIME
+)
+
+ENTITY(Расписание,
+  schedule_id : INT PK
+  --
+  course_id : INT FK
+  date_time : DATETIME
+  location : VARCHAR
+  duration : INT
+)
+
+ENTITY(Посещаемость,
+  attendance_id : INT PK
+  --
+  schedule_id : INT FK
+  student_id : INT FK
+  status : VARCHAR
+)
+
+ENTITY(Оценки,
+  assessment_id : INT PK
+  --
+  course_id : INT FK
+  student_id : INT FK
+  score : DECIMAL
+  feedback : TEXT
+  created_at : DATETIME
+)
+
+ENTITY(Сообщения,
+  message_id : INT PK
+  --
+  sender_id : INT FK
+  receiver_id : INT FK
+  content : TEXT
+  created_at : DATETIME
+)
+
+Пользователи ||--o{ Курсы : teacher_id
+Курсы ||--o{ Учебные_материалы : course_id
+Курсы ||--o{ Расписание : course_id
+Расписание ||--o{ Посещаемость : schedule_id
+Пользователи ||--o{ Посещаемость : student_id
+Курсы ||--o{ Оценки : course_id
+Пользователи ||--o{ Оценки : student_id
+Пользователи ||--o{ Сообщения : sender_id
+Пользователи ||--o{ Сообщения : receiver_id
+
+hide circle
+@enduml
